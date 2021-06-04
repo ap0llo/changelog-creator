@@ -13,9 +13,7 @@ namespace Build
         {
             if (context.IsAzurePipelines)
             {
-                var packagesFiles = Directory.GetFiles(context.PackageOutputPath.FullPath, "*.nupkg");
-
-                foreach (var file in packagesFiles)
+                foreach (var file in context.FileSystem.GetFilePaths(context.PackageOutputPath, "*.nupkg"))
                 {
                     context.AzurePipelines().Commands.UploadArtifact(context.ArtifactNames.Binaries, file);
                 }
