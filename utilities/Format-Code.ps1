@@ -8,7 +8,7 @@
 . (Join-Path $PSScriptRoot "common.ps1")
 
 # Variables
-$sourceFolders = @("./src", "./utilities") # The path of the folder to format (relative to the repository root)
+$sourceFolders = @("./src", "./utilities", "./build") # The path of the folder to format (relative to the repository root)
 
 # Main script
 Push-Location (Get-RepositoryRoot)

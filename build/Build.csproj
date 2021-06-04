@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <RunWorkingDirectory>$(MSBuildProjectDirectory)</RunWorkingDirectory>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+    
+  <ItemGroup>
+    <PackageReference Include="Cake.Frosting" Version="1.1.0" />
+  </ItemGroup>
+
+</Project>
