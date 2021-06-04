@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Cake.Common.Build;
-using Cake.Common.Tools.DotNetCore;
+﻿using Cake.Common.Tools.DotNetCore;
 using Cake.Core;
 using Cake.Core.Diagnostics;
 using Cake.Frosting;

@@ -1,6 +1,4 @@
-﻿using System.IO;
-using Cake.Common.Build;
-using Cake.Common.IO;
+﻿using Cake.Common.Build;
 using Cake.Frosting;
 
 namespace Build
@@ -9,16 +7,14 @@ namespace Build
     [Dependency(typeof(PackTask))]
     public class PublishArtifactsTask : FrostingTask<BuildContext>
     {
+        public override bool ShouldRun(BuildContext context) => context.IsAzurePipelines;
+
         public override void Run(BuildContext context)
         {
-            if (context.IsAzurePipelines)
+            foreach (var file in context.FileSystem.GetFilePaths(context.PackageOutputPath, "*.nupkg"))
             {
-                foreach (var file in context.FileSystem.GetFilePaths(context.PackageOutputPath, "*.nupkg"))
-                {
-                    context.AzurePipelines().Commands.UploadArtifact(context.ArtifactNames.Binaries, file);
-                }
+                context.AzurePipelines().Commands.UploadArtifact(context.ArtifactNames.Binaries, file);
             }
         }
-
     }
 }

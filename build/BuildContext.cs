@@ -13,8 +13,7 @@ namespace Build
             public string Binaries { get; init; } = "";
         }
 
-        //TODO
-        public DirectoryPath RootDirectory { get; set; } = DirectoryPath.FromString(System.IO.Path.GetFullPath(".."));
+        public DirectoryPath RootDirectory { get; set; }
 
         public FilePath SolutionPath => RootDirectory.CombineWithFilePath("ChangeLog.sln");
 
@@ -26,8 +25,8 @@ namespace Build
 
         public DirectoryPath TestResultsPath { get; }
 
-
         public bool IsAzurePipelines { get; }
+
 
         public ArtifactNameSettings ArtifactNames { get; } = new ArtifactNameSettings()
         {
@@ -37,6 +36,8 @@ namespace Build
 
         public BuildContext(ICakeContext context) : base(context)
         {
+            RootDirectory = context.Environment.WorkingDirectory;
+
             BuildConfiguration = context.Arguments.GetArgument("configuration") ?? "Release";
 
             IsAzurePipelines = context.AzurePipelines().IsRunningOnAzurePipelines || context.AzurePipelines().IsRunningOnAzurePipelinesHosted;
@@ -48,7 +49,7 @@ namespace Build
 
             PackageOutputPath = IsAzurePipelines
                 ? context.AzurePipelines().Environment.Build.ArtifactStagingDirectory.FullPath
-                : BaseOutputPath.Combine(DirectoryPath.FromString($"{BuildConfiguration}/packages/")); //TODO
+                : BaseOutputPath.Combine(DirectoryPath.FromString($"{BuildConfiguration}/packages/"));
 
             TestResultsPath = BaseOutputPath.CombineWithFilePath("TestResults").FullPath;
         }
