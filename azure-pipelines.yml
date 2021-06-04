@@ -150,25 +150,6 @@ jobs:
   #     }
   #   displayName: 'Publish Artifacts: $(artifactsName_Binaries)'
 
-  # Verify documentation
-  - task: DotNetCoreCLI@2
-    inputs:
-      command: run
-      arguments: >-
-        --project ./utilities/docs/docs.csproj
-        --
-        validate ./docs README.md
-    displayName: Validate documentation
-
-  # Verify configuration file schema
-  - task: DotNetCoreCLI@2
-    inputs:
-      command: run
-      arguments: >-
-        --project ./utilities/schema/schema.csproj
-        --
-        validate ./schemas/configuration/schema.json
-    displayName: Validate Configuration File Schema
 
   # Generate changelog and publish as build artifact
   - task: DotNetCoreCLI@2

@@ -1,0 +1,22 @@
+﻿using Cake.Common.Tools.DotNetCore;
+using Cake.Core;
+using Cake.Core.IO;
+using Cake.Frosting;
+
+namespace Build
+{
+    [TaskName("ValidateConfigurationSchema")]
+    [Dependency(typeof(BuildTask))]
+    public class ValidateConfigurationSchemaTask : FrostingTask<BuildContext>
+    {
+        public override void Run(BuildContext context)
+        {
+            context.DotNetCoreRun(
+                "./utilities/schema/schema.csproj",
+                new ProcessArgumentBuilder()
+                    .Append("validate")
+                    .Append("./schemas/configuration/schema.json")
+            );
+        }
+    }
+}

@@ -10,6 +10,8 @@ namespace Build
     [Dependency(typeof(PublishTestResultsTask))]
     [Dependency(typeof(PackTask))]
     [Dependency(typeof(PublishArtifactsTask))]
+    [Dependency(typeof(ValidateDocumentationTask))]
+    [Dependency(typeof(ValidateConfigurationSchemaTask))]
     public class CITask : FrostingTask
     {
     }
