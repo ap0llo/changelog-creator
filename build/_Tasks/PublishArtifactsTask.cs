@@ -13,7 +13,7 @@ namespace Build
         {
             foreach (var file in context.FileSystem.GetFilePaths(context.PackageOutputPath, "*.nupkg"))
             {
-                context.AzurePipelines().Commands.UploadArtifact(context.ArtifactNames.Binaries, file);
+                context.AzurePipelines().Commands.UploadArtifact("", file, context.ArtifactNames.Binaries);
             }
         }
     }
