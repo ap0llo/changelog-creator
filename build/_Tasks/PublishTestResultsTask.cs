@@ -30,7 +30,8 @@ namespace Build
             azurePipelines.Commands.PublishTestResults(new()
             {
                 Configuration = context.BuildConfiguration,
-                TestResultsFiles = testResults
+                TestResultsFiles = testResults,
+                TestRunner = AzurePipelinesTestRunnerType.VSTest
             });
 
             // Azure Pipelines only supports publishing a single coverage result file,
