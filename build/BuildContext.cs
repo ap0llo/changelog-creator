@@ -20,7 +20,11 @@ namespace Build
 
         public string BuildConfiguration { get; set; }
 
+        public DirectoryPath BaseOutputPath { get; set; }
+
         public DirectoryPath PackageOutputPath { get; }
+
+        public DirectoryPath TestResultsPath { get; }
 
 
         public bool IsAzurePipelines { get; }
@@ -37,12 +41,16 @@ namespace Build
 
             IsAzurePipelines = context.AzurePipelines().IsRunningOnAzurePipelines || context.AzurePipelines().IsRunningOnAzurePipelinesHosted;
 
+            //TODO: This is duplicates in Directory.Build.props
+            BaseOutputPath = IsAzurePipelines
+                ? context.AzurePipelines().Environment.Build.BinariesDirectory.FullPath
+                : RootDirectory.CombineWithFilePath("Binaries").FullPath;
+
             PackageOutputPath = IsAzurePipelines
                 ? context.AzurePipelines().Environment.Build.ArtifactStagingDirectory.FullPath
-                : RootDirectory.Combine(DirectoryPath.FromString($"Binaries/{BuildConfiguration}/packages/")); //TODO
+                : BaseOutputPath.Combine(DirectoryPath.FromString($"{BuildConfiguration}/packages/")); //TODO
 
-
-
+            TestResultsPath = BaseOutputPath.CombineWithFilePath("TestResults").FullPath;
         }
     }
 }
