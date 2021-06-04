@@ -45,6 +45,8 @@ namespace Build
 
             context.Log.Information("Merging coverage files");
 
+
+            var htmlReportType = context.IsAzurePipelines ? "HtmlInline_AzurePipelines" : "Html";
             context.DotNetCoreTool(new ProcessArgumentBuilder()
                 .Append("tool")
                 .Append("run")
@@ -52,7 +54,7 @@ namespace Build
                 .Append("--")
                 .Append($"-reports:{String.Join(";", coverageFiles)}")
                 .Append($"-targetdir:{context.TestResultsPath.Combine("Coverage")}")
-                .Append("-reporttypes:cobertura")
+                .Append($"-reporttypes:cobertura;{htmlReportType}")
                 .Render()
             );
 
@@ -60,7 +62,8 @@ namespace Build
             azurePipelines.Commands.PublishCodeCoverage(new()
             {
                 CodeCoverageTool = AzurePipelinesCodeCoverageToolType.Cobertura,
-                SummaryFileLocation = context.TestResultsPath.CombineWithFilePath("Coverage/Cobertura.xml")
+                SummaryFileLocation = context.TestResultsPath.CombineWithFilePath("Coverage/Cobertura.xml"),
+                ReportDirectory = context.TestResultsPath.Combine("Coverage"),
             });
         }
 
