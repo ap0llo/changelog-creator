@@ -109,6 +109,7 @@ jobs:
  
   # Restore, Build, Test
   - powershell: ./build.ps1 --target CI --configuration $(configuration)
+    displayName: Main Build
 
  
   # # The PublishCodeCoverageResults task only supports publishing a single coverage result file,

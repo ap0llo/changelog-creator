@@ -11,11 +11,11 @@ namespace Build
 {
     [TaskName("SetBuildNumber")]
     [Dependency(typeof(RestoreToolsTask))]
-    public class SetBuildNumberTask : FrostingTask
+    public class SetBuildNumberTask : FrostingTask<BuildContext>
     {
-        public override void Run(ICakeContext context)
+        public override void Run(BuildContext context)
         {
-            if (context.AzurePipelines().IsRunningOnAzurePipelines)
+            if (context.IsAzurePipelines)
             {
                 context.Log.Information("Setting Build Number using nbgv");
                 context.DotNetCoreTool("nbgv cloud --all-vars");

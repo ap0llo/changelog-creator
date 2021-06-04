@@ -22,6 +22,9 @@ namespace Build
 
         public DirectoryPath PackageOutputPath { get; }
 
+
+        public bool IsAzurePipelines { get; }
+
         public ArtifactNameSettings ArtifactNames { get; } = new ArtifactNameSettings()
         {
             Binaries = "Binaries"
@@ -32,9 +35,14 @@ namespace Build
         {
             BuildConfiguration = context.Arguments.GetArgument("configuration") ?? "Release";
 
-            PackageOutputPath = context.AzurePipelines().IsRunningOnAzurePipelines
+            IsAzurePipelines = context.AzurePipelines().IsRunningOnAzurePipelines || context.AzurePipelines().IsRunningOnAzurePipelinesHosted;
+
+            PackageOutputPath = IsAzurePipelines
                 ? context.AzurePipelines().Environment.Build.ArtifactStagingDirectory.FullPath
                 : RootDirectory.Combine(DirectoryPath.FromString($"Binaries/{BuildConfiguration}/packages/")); //TODO
+
+
+
         }
     }
 }

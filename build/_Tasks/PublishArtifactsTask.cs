@@ -11,7 +11,7 @@ namespace Build
     {
         public override void Run(BuildContext context)
         {
-            if (context.AzurePipelines().IsRunningOnAzurePipelines)
+            if (context.IsAzurePipelines)
             {
                 var packagesFiles = Directory.GetFiles(context.PackageOutputPath.FullPath, "*.nupkg");
 
