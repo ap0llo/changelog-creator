@@ -18,7 +18,7 @@ namespace Build
             if (context.IsAzurePipelines)
             {
                 context.Log.Information("Setting Build Number using nbgv");
-                context.DotNetCoreTool("nbgv cloud --all-vars");
+                context.DotNetCoreTool("tool run nbgv -- cloud --all-vars");
             }
         }
     }
