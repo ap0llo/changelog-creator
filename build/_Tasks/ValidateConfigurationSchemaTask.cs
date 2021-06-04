@@ -1,4 +1,5 @@
 ﻿using Cake.Common.Tools.DotNetCore;
+using Cake.Common.Tools.DotNetCore.Run;
 using Cake.Core;
 using Cake.Core.IO;
 using Cake.Frosting;
@@ -15,7 +16,13 @@ namespace Build
                 "./utilities/schema/schema.csproj",
                 new ProcessArgumentBuilder()
                     .Append("validate")
-                    .Append("./schemas/configuration/schema.json")
+                    .Append("./schemas/configuration/schema.json"),
+                new DotNetCoreRunSettings()
+                {
+                    Configuration = context.BuildConfiguration,
+                    NoBuild = true,
+                    NoRestore = true,
+                }
             );
         }
     }

@@ -10,7 +10,9 @@ namespace Build
     {
         public class ArtifactNameSettings
         {
-            public string Binaries { get; init; } = "";
+            public string Binaries => "Binaries";
+
+            public string ChangeLog => "ChangeLog";
         }
 
         public DirectoryPath RootDirectory { get; set; }
@@ -25,13 +27,12 @@ namespace Build
 
         public DirectoryPath TestResultsPath { get; }
 
+        public FilePath ChangeLogOutputPath { get; }
+
         public bool IsAzurePipelines { get; }
 
 
-        public ArtifactNameSettings ArtifactNames { get; } = new ArtifactNameSettings()
-        {
-            Binaries = "Binaries"
-        };
+        public ArtifactNameSettings ArtifactNames { get; } = new();
 
 
         public BuildContext(ICakeContext context) : base(context)
@@ -52,6 +53,8 @@ namespace Build
                 : BaseOutputPath.Combine(DirectoryPath.FromString($"{BuildConfiguration}/packages/"));
 
             TestResultsPath = BaseOutputPath.CombineWithFilePath("TestResults").FullPath;
+
+            ChangeLogOutputPath = BaseOutputPath.CombineWithFilePath("changelog.md");
         }
     }
 }

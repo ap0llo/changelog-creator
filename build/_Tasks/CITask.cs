@@ -12,6 +12,8 @@ namespace Build
     [Dependency(typeof(PublishArtifactsTask))]
     [Dependency(typeof(ValidateDocumentationTask))]
     [Dependency(typeof(ValidateConfigurationSchemaTask))]
+    [Dependency(typeof(GenerateChangeLogTask))]
+    [Dependency(typeof(PublishChangeLogTask))]
     public class CITask : FrostingTask
     {
     }

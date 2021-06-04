@@ -16,6 +16,12 @@
           "Microsoft.Extensions.DependencyInjection": "5.0.1"
         }
       },
+      "Cake.GitVersioning": {
+        "type": "Direct",
+        "requested": "[3.4.205, )",
+        "resolved": "3.4.205",
+        "contentHash": "2vwAFYDxcD5nIi+UxOIpnHokg/EE6PZOcruWEkcSYBIlHpCIRt5MLjj1Y209D//xqlzASGSPK2GhWML4BGUtAg=="
+      },
       "Microsoft.SourceLink.GitHub": {
         "type": "Direct",
         "requested": "[1.0.0, )",

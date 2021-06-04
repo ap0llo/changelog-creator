@@ -1,4 +1,5 @@
 ﻿using Cake.Common.Tools.DotNetCore;
+using Cake.Common.Tools.DotNetCore.Run;
 using Cake.Core;
 using Cake.Core.IO;
 using Cake.Frosting;
@@ -16,7 +17,13 @@ namespace Build
                 new ProcessArgumentBuilder()
                     .Append("validate")
                     .Append("./docs")
-                    .Append("README.md")
+                    .Append("README.md"),
+                new DotNetCoreRunSettings()
+                {
+                    Configuration = context.BuildConfiguration,
+                    NoBuild = true,
+                    NoRestore = true,
+                }
             );
 
         }

@@ -110,69 +110,10 @@ jobs:
   # Restore, Build, Test
   - powershell: ./build.ps1 --target CI --configuration $(configuration)
     displayName: Main Build
-
- 
-  # # The PublishCodeCoverageResults task only supports publishing a single coverage result file,
-  # # so the results are merged into a single cobertura file using "ReportGenerator"
-  # # The dotnet test task redirects test results to $(Agent.TempDirectory) so coverage reports will be written there, too
-  # - script: >-
-  #     dotnet tool run reportgenerator
-  #     -reports:$(Agent.TempDirectory)/**/coverage.cobertura.xml
-  #     -targetdir:$(Agent.TempDirectory)/TestResults/Coverage
-  #     -reporttypes:cobertura
-  #   displayName: Merge Code Coverage Results
-  # - task: PublishCodeCoverageResults@1
-  #   displayName: Publish Code Coverage results
-  #   inputs:
-  #     codeCoverageTool: cobertura
-  #     summaryFileLocation: $(Agent.TempDirectory)/TestResults/Coverage/Cobertura.xml
-  #     failIfCoverageEmpty: true
-
-
-  # # Create NuGet Package and  publish as build artifact
-  # - task: CmdLine@2
-  #   displayName: Pack NuGet package
-  #   inputs:
-  #     script: >-
-  #       dotnet pack $(solutionPath)
-  #       --configuration $(configuration)
-  #       --output $(Build.ArtifactStagingDirectory)
-  #       --no-build
-  #       /warnaserror
-  # # Use a inline Powershell script for publishing artifacts instead of the built-in PublishBuildArtifacts task
-  # # because the built-in task does not support wildcards and the artifacts staging directory contains other
-  # # artifacts as well (e.g. the variables JSON file published as the 'Variables' artifacts)
-  # - powershell: |
-  #     $packageFiles = Get-ChildItem -Path "$(Build.ArtifactStagingDirectory)" -Filter "*.nupkg"
-  #     foreach($packageFile in $packageFiles) {
-  #       Write-Host "Publishing Artifact '$($packageFile.FullName)'"
-  #       Write-Host "##vso[artifact.upload artifactname=$(artifactsName_Binaries)]$($packageFile.FullName)"
-  #     }
-  #   displayName: 'Publish Artifacts: $(artifactsName_Binaries)'
-
-
-  # Generate changelog and publish as build artifact
-  - task: DotNetCoreCLI@2
-    displayName: Generate Change Log
-    inputs:
-      command: run
-      arguments: >-
-        --project ./src/ChangeLog/Grynwald.ChangeLog.csproj
-        --framework net5.0
-        --
-        --currentVersion $(NBGV_NuGetPackageVersion)
-        --versionRange [$(NBGV_NuGetPackageVersion)]
-        --outputpath $(Build.StagingDirectory)/changelog.md
-        --template GitHubRelease
-        --verbose
     env:
       CHANGELOG__INTEGRATIONS__GITHUB__ACCESSTOKEN: $(GitHub.AccessToken)
 
-  - task: PublishBuildArtifacts@1
-    displayName: 'Publish Artifacts: $(artifactsName_ChangeLog)'
-    inputs:
-      pathToPublish: $(Build.StagingDirectory)/changelog.md
-      artifactName: $(artifactsName_ChangeLog)
+ 
 
 # Job to push package to MyGet.org after build
 - job: Publish_to_MyGet
