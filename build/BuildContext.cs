@@ -21,6 +21,11 @@ namespace Build
             /// The Azure Pipelines artifact name under which to save the auto-generated change log
             /// </summary>
             public string ChangeLog => "ChangeLog";
+
+            /// <summary>
+            /// The Azure Pipelines artifact name under which to save test result files
+            /// </summary>
+            public string TestResults => "TestResults";
         }
 
         /// <summary>

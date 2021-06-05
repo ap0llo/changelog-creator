@@ -78,12 +78,26 @@ namespace Build
             if (context.IsRunningOnAzurePipelines())
             {
                 context.Log.Information("Publishing Test Results to Azure Pipelines");
-                context.AzurePipelines().Commands.PublishTestResults(new()
+                var azurePipelines = context.AzurePipelines();
+
+                // Publish test results to Azure Pipelines test UI
+                azurePipelines.Commands.PublishTestResults(new()
                 {
                     Configuration = context.BuildConfiguration,
                     TestResultsFiles = testResults,
                     TestRunner = AzurePipelinesTestRunnerType.VSTest
                 });
+
+                // Publish result files as downloadable artifact
+                foreach (var testResult in testResults)
+                {
+                    context.Log.Debug($"Publishing '{testResult}' as build artifact");
+                    azurePipelines.Commands.UploadArtifact(
+                        folderName: "",
+                        file: testResult,
+                        context.ArtifactNames.TestResults
+                    );
+                }
             }
         }
 
