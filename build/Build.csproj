@@ -11,6 +11,7 @@
     <PackageReference Include="Cake.Frosting" Version="1.1.0" />
     <PackageReference Include="Cake.GitVersioning" Version="3.4.205" />
     <PackageReference Include="ThisAssembly.Project" Version="1.0.8" />
+    <PackageReference Include="Cake.BuildSystems.Module" Version="3.0.3" />
   </ItemGroup>
 
   <!--
