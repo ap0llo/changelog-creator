@@ -1,8 +1,10 @@
-﻿using Cake.Common.Build;
+﻿using System;
+using System.Collections.Generic;
+using Cake.Common;
+using Cake.Common.IO;
 using Cake.Core;
 using Cake.Core.IO;
 using Cake.Frosting;
-
 
 namespace Build
 {
@@ -10,51 +12,115 @@ namespace Build
     {
         public class ArtifactNameSettings
         {
+            /// <summary>
+            /// The name of the main artifact on Azure Pipelines
+            /// </summary>
             public string Binaries => "Binaries";
 
+            /// <summary>
+            /// The Azure Pipelines artifact name under which to save the auto-generated change log
+            /// </summary>
             public string ChangeLog => "ChangeLog";
         }
 
+        /// <summary>
+        /// Gets the path of the repository's root directory
+        /// </summary>
         public DirectoryPath RootDirectory { get; set; }
 
+        /// <summary>
+        /// Gets the path of the Visual Studio solution to build/test
+        /// </summary>
         public FilePath SolutionPath => RootDirectory.CombineWithFilePath("ChangeLog.sln");
 
+        /// <summary>
+        /// Gets the configuration to build (Debug/Relesae)
+        /// </summary>
         public string BuildConfiguration { get; set; }
 
+        /// <summary>
+        /// Gets the base output path for the build
+        /// </summary>
         public DirectoryPath BaseOutputPath { get; set; }
 
+        /// <summary>
+        /// Gets the output path for NuGet packages
+        /// </summary>
         public DirectoryPath PackageOutputPath { get; }
 
+        /// <summary>
+        /// Gets the output path for test results
+        /// </summary>
         public DirectoryPath TestResultsPath { get; }
 
-        public FilePath ChangeLogOutputPath { get; }
+        /// <summary>
+        /// Gets the output path for the auto-generated change log
+        /// </summary>
+        public FilePath ChangeLogOutputPath => BaseOutputPath.CombineWithFilePath("changelog.md");
 
-        public bool IsAzurePipelines { get; }
+        /// <summary>
+        /// Gets whether test execution should collect code coverage
+        /// </summary>
+        public bool CollectCodeCoverage { get; }
 
-
+        /// <summary>
+        /// Gets the names for Azure Pipelines artifacts
+        /// </summary>
         public ArtifactNameSettings ArtifactNames { get; } = new();
+
+        /// <summary>
+        /// Gets the path of the directory to store code coverage history
+        /// </summary>
+        public DirectoryPath CodeCoverageHistoryDirectory => BaseOutputPath.Combine("CoverageHistory");
+
+        /// <summary>
+        /// Gets the path of the directory to save code coverage to (including the coverage HTML report)
+        /// </summary>
+        public DirectoryPath CodeCoverageOutputDirectory => TestResultsPath.Combine("Coverage");
+
+        /// <summary>
+        /// Gets the directories to apply code formatting rules to.
+        /// </summary>
+        public IEnumerable<DirectoryPath> FormattableCodeDirectories
+        {
+            get
+            {
+                yield return RootDirectory.Combine("build");
+                yield return RootDirectory.Combine("src");
+                yield return RootDirectory.Combine("utilities");
+            }
+        }
 
 
         public BuildContext(ICakeContext context) : base(context)
         {
             RootDirectory = context.Environment.WorkingDirectory;
 
-            BuildConfiguration = context.Arguments.GetArgument("configuration") ?? "Release";
+            BuildConfiguration = context.Argument("configuration", "Release");
+            CollectCodeCoverage = context.Argument("collect-code-coverage", true);
 
-            IsAzurePipelines = context.AzurePipelines().IsRunningOnAzurePipelines || context.AzurePipelines().IsRunningOnAzurePipelinesHosted;
+            // Values are defined in Directory.Build.props and embedded into the build assembly
+            // using the 'ThisAssembly.Project' source generator
+            BaseOutputPath = ThisAssembly.Project.BaseOutputPath;
+            PackageOutputPath = ThisAssembly.Project.PackageOutputPath;
+            TestResultsPath = ThisAssembly.Project.VSTestResultsDirectory;
 
-            //TODO: This is duplicates in Directory.Build.props
-            BaseOutputPath = IsAzurePipelines
-                ? context.AzurePipelines().Environment.Build.BinariesDirectory.FullPath
-                : RootDirectory.CombineWithFilePath("Binaries").FullPath;
+            Validate();
+        }
 
-            PackageOutputPath = IsAzurePipelines
-                ? context.AzurePipelines().Environment.Build.ArtifactStagingDirectory.FullPath
-                : BaseOutputPath.Combine(DirectoryPath.FromString($"{BuildConfiguration}/packages/"));
 
-            TestResultsPath = BaseOutputPath.CombineWithFilePath("TestResults").FullPath;
+        private void Validate()
+        {
+            if (!this.DirectoryExists(RootDirectory))
+            {
+                throw new Exception($"Repository root directory '{RootDirectory}' does not exist");
+            }
 
-            ChangeLogOutputPath = BaseOutputPath.CombineWithFilePath("changelog.md");
+            if (!BuildConfiguration.Equals("Release", StringComparison.OrdinalIgnoreCase) &&
+               !BuildConfiguration.Equals("Debug", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new Exception($"Unsupported build configuration '{BuildConfiguration}'");
+            }
         }
     }
 }

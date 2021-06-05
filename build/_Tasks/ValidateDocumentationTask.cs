@@ -7,6 +7,7 @@ using Cake.Frosting;
 namespace Build
 {
     [TaskName("ValidateDocumentation")]
+    [TaskDescription("Validates documentation files")]
     [Dependency(typeof(BuildTask))]
     public class ValidateDocumentationTask : FrostingTask<BuildContext>
     {

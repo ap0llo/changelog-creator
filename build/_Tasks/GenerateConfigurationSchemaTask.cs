@@ -6,17 +6,17 @@ using Cake.Frosting;
 
 namespace Build
 {
-    [TaskName("ValidateConfigurationSchema")]
-    [TaskDescription("Validates that the configuration file JSON schema is up to date")]
+    [TaskName("GenerateConfigurationSchema")]
+    [TaskDescription("(Re)generates the configuration file JSON schema")]
     [Dependency(typeof(BuildTask))]
-    public class ValidateConfigurationSchemaTask : FrostingTask<BuildContext>
+    public class GenerateConfigurationSchemaTask : FrostingTask<BuildContext>
     {
         public override void Run(BuildContext context)
         {
             context.DotNetCoreRun(
                 "./utilities/schema/schema.csproj",
                 new ProcessArgumentBuilder()
-                    .Append("validate")
+                    .Append("generate")
                     .Append("./schemas/configuration/schema.json"),
                 new DotNetCoreRunSettings()
                 {

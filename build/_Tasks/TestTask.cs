@@ -1,29 +1,128 @@
-﻿using Cake.Common.IO;
+﻿using System;
+using System.Linq;
+using Cake.Common.Build;
+using Cake.Common.Build.AzurePipelines.Data;
+using Cake.Common.IO;
 using Cake.Common.Tools.DotNetCore;
 using Cake.Common.Tools.DotNetCore.Test;
+using Cake.Core;
 using Cake.Core.Diagnostics;
+using Cake.Core.IO;
 using Cake.Frosting;
 
 namespace Build
 {
     [TaskName("Test")]
+    [TaskDescription("Runs all tests")]
     [Dependency(typeof(BuildTask))]
-    [Dependency(typeof(CleanTestResultsTask))]
     public class TestTask : FrostingTask<BuildContext>
     {
         public override void Run(BuildContext context)
         {
-            context.Log.Information($"Running tests for {context.SolutionPath}");
-            context.DotNetCoreTest(context.SolutionPath.FullPath, new DotNetCoreTestSettings()
+            if (context.DirectoryExists(context.TestResultsPath))
+            {
+                context.Log.Information($"Cleaning test results directory '{context.TestResultsPath}'");
+                context.DeleteDirectory(context.TestResultsPath, new() { Force = true, Recursive = true });
+            }
+
+            RunTests(context);
+
+            if (context.CollectCodeCoverage)
+            {
+                GenerateCoverageReport(context);
+            }
+        }
+
+
+        private void RunTests(BuildContext context)
+        {
+            context.Log.Information($"Running tests for {context.SolutionPath}, Collect Code Coverage: {context.CollectCodeCoverage}");
+
+            //
+            // Run tests
+            //
+            var settings = new DotNetCoreTestSettings()
             {
                 Configuration = context.BuildConfiguration,
                 NoBuild = true,
-                Loggers = new[]
+                Loggers = new[] { "trx" },
+            };
+
+            if (context.CollectCodeCoverage)
+            {
+                settings.Collectors = new[] { "XPlat Code Coverage" };
+            }
+
+            context.DotNetCoreTest(
+                context.SolutionPath.FullPath,
+                settings
+            );
+
+            // 
+            // Publish Test Resilts
+            // 
+            var testResults = context.FileSystem.GetFilePaths(context.TestResultsPath, "*.trx", SearchScope.Current);
+
+            if (!testResults.Any())
+                throw new Exception($"No test results found in '{context.TestResultsPath}'");
+
+            if (context.IsRunningOnAzurePipelines())
+            {
+                context.Log.Information("Publishing Test Results to Azure Pipelines");
+                context.AzurePipelines().Commands.PublishTestResults(new()
                 {
-                    "trx"
-                },
-                Collectors = new[] { "XPlat Code Coverage" },
-            });
+                    Configuration = context.BuildConfiguration,
+                    TestResultsFiles = testResults,
+                    TestRunner = AzurePipelinesTestRunnerType.VSTest
+                });
+            }
+        }
+
+        private void GenerateCoverageReport(BuildContext context)
+        {
+            if (context.DirectoryExists(context.CodeCoverageOutputDirectory))
+            {
+                context.Log.Information($"Cleaning code coveraget output directory '{context.CodeCoverageOutputDirectory}'");
+                context.DeleteDirectory(context.CodeCoverageOutputDirectory, new() { Force = true, Recursive = true });
+            }
+
+            var coverageFiles = context.FileSystem.GetFilePaths(context.TestResultsPath, "coverage.cobertura.xml", SearchScope.Recursive);
+
+            if (!coverageFiles.Any())
+                throw new Exception($"No coverage files found in '{context.TestResultsPath}'");
+
+            context.Log.Information($"Found {coverageFiles.Count} coverage files");
+
+            //
+            // Generate Coverage Report and merged code coverage file
+            //
+            context.Log.Information("Merging coverage files");
+            var htmlReportType = context.IsRunningOnAzurePipelines() ? "HtmlInline_AzurePipelines" : "Html";
+            context.DotNetCoreTool(new ProcessArgumentBuilder()
+                .Append("tool")
+                .Append("run")
+                .Append("reportgenerator")
+                .Append("--")
+                .Append($"-reports:{String.Join(";", coverageFiles)}")
+                .Append($"-targetdir:{context.CodeCoverageOutputDirectory}")
+                .Append($"-reporttypes:cobertura;{htmlReportType}")
+                .Append($"-historyDir:{context.CodeCoverageHistoryDirectory}")
+                .Render()
+            );
+
+            //
+            // Publish Code coverage report
+            //
+            if (context.IsRunningOnAzurePipelines())
+            {
+                context.Log.Information("Publishing Code Coverage Results to Azure Pipelines");
+                context.AzurePipelines().Commands.PublishCodeCoverage(new()
+                {
+                    CodeCoverageTool = AzurePipelinesCodeCoverageToolType.Cobertura,
+                    SummaryFileLocation = context.CodeCoverageOutputDirectory.CombineWithFilePath("Cobertura.xml"),
+                    ReportDirectory = context.CodeCoverageOutputDirectory
+                });
+            }
         }
     }
 }

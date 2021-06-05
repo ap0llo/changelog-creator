@@ -6,18 +6,18 @@ using Cake.Frosting;
 
 namespace Build
 {
-    [TaskName("ValidateConfigurationSchema")]
-    [TaskDescription("Validates that the configuration file JSON schema is up to date")]
+    [TaskName("GenerateDocumentation")]
+    [TaskDescription("Updates auto-generated documentation files")]
     [Dependency(typeof(BuildTask))]
-    public class ValidateConfigurationSchemaTask : FrostingTask<BuildContext>
+    public class GenerateDocumentationTask : FrostingTask<BuildContext>
     {
         public override void Run(BuildContext context)
         {
             context.DotNetCoreRun(
-                "./utilities/schema/schema.csproj",
+                "./utilities/docs/docs.csproj",
                 new ProcessArgumentBuilder()
-                    .Append("validate")
-                    .Append("./schemas/configuration/schema.json"),
+                    .Append("generate")
+                    .Append("./docs"),
                 new DotNetCoreRunSettings()
                 {
                     Configuration = context.BuildConfiguration,
@@ -25,6 +25,7 @@ namespace Build
                     NoRestore = true,
                 }
             );
+
         }
     }
 }

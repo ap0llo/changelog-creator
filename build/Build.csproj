@@ -10,6 +10,17 @@
   <ItemGroup>
     <PackageReference Include="Cake.Frosting" Version="1.1.0" />
     <PackageReference Include="Cake.GitVersioning" Version="3.4.205" />
+    <PackageReference Include="ThisAssembly.Project" Version="1.0.8" />
+  </ItemGroup>
+
+  <!--
+    Embed build settings defined in Directory.Build.props into the assembly using the 'ThisAssembly.Project' source generator
+    so that they are available to the build project
+  -->
+  <ItemGroup>
+    <ProjectProperty Include="BaseOutputPath" />
+    <ProjectProperty Include="PackageOutputPath" />
+    <ProjectProperty Include="VSTestResultsDirectory" />
   </ItemGroup>
 
 </Project>

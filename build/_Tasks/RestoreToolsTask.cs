@@ -6,6 +6,7 @@ using Cake.Frosting;
 namespace Build
 {
     [TaskName("RestoreTools")]
+    [TaskDescription("Restores .NET Local tools")]
     public class RestoreToolsTask : FrostingTask
     {
         public override void Run(ICakeContext context)

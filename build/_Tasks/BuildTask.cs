@@ -8,6 +8,7 @@ using Cake.Frosting;
 namespace Build
 {
     [TaskName("Build")]
+    [TaskDescription("Compiles the project")]
     public class BuildTask : FrostingTask<BuildContext>
     {
         public override void Run(BuildContext context)

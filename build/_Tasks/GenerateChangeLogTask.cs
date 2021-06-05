@@ -1,4 +1,5 @@
-﻿using Cake.Common.Tools.DotNetCore;
+﻿using Cake.Common.Build;
+using Cake.Common.Tools.DotNetCore;
 using Cake.Common.Tools.DotNetCore.Run;
 using Cake.Core;
 using Cake.Core.IO;
@@ -8,11 +9,15 @@ using Cake.GitVersioning;
 namespace Build
 {
     [TaskName("GenerateChangeLog")]
+    [TaskDescription("Generates a change log for the current repository")]
     [Dependency(typeof(BuildTask))]
     public class GenerateChangeLogTask : FrostingTask<BuildContext>
     {
         public override void Run(BuildContext context)
         {
+            //
+            // Generate change log
+            //
             var versionOracle = context.GitVersioningGetVersion();
 
             context.DotNetCoreRun(
@@ -32,6 +37,18 @@ namespace Build
                     Framework = "net5.0",
                 }
             );
+
+            //
+            // Publish change log
+            //
+            if (context.IsRunningOnAzurePipelines())
+            {
+                context.AzurePipelines().Commands.UploadArtifact(
+                    folderName: "",
+                    file: context.ChangeLogOutputPath,
+                    artifactName: context.ArtifactNames.ChangeLog
+                );
+            }
         }
     }
 }
