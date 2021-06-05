@@ -33,14 +33,20 @@ namespace Build
             }
         }
 
+        public override void OnError(Exception exception, BuildContext context)
+        {
+            // If test execution failed, publish test results anyways (so the error can be inspected)
+            // but do not throw in PublishTestResults() when there are not test results
+            PublishTestResults(context, failInMissingTestResults: false);
+
+            base.OnError(exception, context);
+        }
 
         private void RunTests(BuildContext context)
         {
             context.Log.Information($"Running tests for {context.SolutionPath}, Collect Code Coverage: {context.CollectCodeCoverage}");
 
-            //
             // Run tests
-            //
             var settings = new DotNetCoreTestSettings()
             {
                 Configuration = context.BuildConfiguration,
@@ -58,12 +64,15 @@ namespace Build
                 settings
             );
 
-            // 
             // Publish Test Resilts
-            // 
+            PublishTestResults(context, failInMissingTestResults: true);
+        }
+
+        private static void PublishTestResults(BuildContext context, bool failInMissingTestResults)
+        {
             var testResults = context.FileSystem.GetFilePaths(context.TestResultsPath, "*.trx", SearchScope.Current);
 
-            if (!testResults.Any())
+            if (!testResults.Any() && failInMissingTestResults)
                 throw new Exception($"No test results found in '{context.TestResultsPath}'");
 
             if (context.IsRunningOnAzurePipelines())
