@@ -3,7 +3,7 @@
     "changelog": {
 
         "integrations": {
-            "provider": "None"
+            "provider": "GitHub"
         },
 
         "scopes": {
