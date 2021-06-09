@@ -80,147 +80,40 @@ jobs:
       packageType: runtime
       version: 3.1.x
 
-  # Restore local .NET Core tools
-  - task: DotNetCoreCLI@2
-    displayName: Restore local tools
-    inputs:
-      command: custom
-      custom: tool
-      arguments: restore
+  
+  # # Save nbgv variables as JSON artifact
+  # - powershell: |
+  #     # Caculate output path
+  #     $outDirPath = Join-Path "$(Build.ArtifactStagingDirectory)" "$(artifactsName_Variables)"
+  #     $outFilePath = Join-Path $outDirPath "nbgv.json"
 
-  # Set the build number using Nerdbank.GitVersioning
-  - script: dotnet tool run nbgv cloud --all-vars
-    displayName: Set Version
+  #     # Get version variables (the value of the 'CloudBuildAllVars' property in the JSON output of nbgv)
+  #     $json = Invoke-Expression "dotnet tool run nbgv -- get-version --format json" | ConvertFrom-Json
+  #     if($LASTEXITCODE -ne 0) {
+  #       throw "'nbgv get-version' completed with exit code $LASTEXITCODE"
+  #     }
+  #     $json = $json.CloudBuildAllVars | ConvertTo-Json
 
-  # Save nbgv variables as JSON artifact
-  - powershell: |
-      # Caculate output path
-      $outDirPath = Join-Path "$(Build.ArtifactStagingDirectory)" "$(artifactsName_Variables)"
-      $outFilePath = Join-Path $outDirPath "nbgv.json"
+  #     # Create output directory
+  #     if(-not (Test-Path $outDirPath)) {
+  #       New-Item -ItemType Directory -Path $outDirPath | Out-Null
+  #     }
 
-      # Get version variables (the value of the 'CloudBuildAllVars' property in the JSON output of nbgv)
-      $json = Invoke-Expression "dotnet tool run nbgv -- get-version --format json" | ConvertFrom-Json
-      if($LASTEXITCODE -ne 0) {
-        throw "'nbgv get-version' completed with exit code $LASTEXITCODE"
-      }
-      $json = $json.CloudBuildAllVars | ConvertTo-Json
+  #     # Save variables to file
+  #     [System.IO.File]::WriteAllText($outFilePath, $json)
 
-      # Create output directory
-      if(-not (Test-Path $outDirPath)) {
-        New-Item -ItemType Directory -Path $outDirPath | Out-Null
-      }
+  #     # Publish artifacts
+  #     Write-Host "##vso[artifact.upload artifactname=$(artifactsName_Variables)]$outFilePath"
+  #   displayName: Save version variables
 
-      # Save variables to file
-      [System.IO.File]::WriteAllText($outFilePath, $json)
-
-      # Publish artifacts
-      Write-Host "##vso[artifact.upload artifactname=$(artifactsName_Variables)]$outFilePath"
-    displayName: Save version variables
-
-  # Check the formatting using dotnet-format
-  - script: |
-      dotnet format ./src --folder --check
-      dotnet format ./utilities --folder --check
-    displayName: Check code formatting
-
-    # Restore, Build, Test
-  - task: CmdLine@2
-    displayName: Restore NuGet packages
-    inputs:
-      script: dotnet restore $(solutionPath) /warnaserror
-  - task: DotNetCoreCLI@2
-    displayName: Build
-    inputs:
-      command: build
-      projects: $(solutionPath)
-      arguments: '--configuration $(configuration) --no-restore /warnaserror'
-  - task: DotNetCoreCLI@2
-    displayName: Test
-    inputs:
-      command: test
-      publishTestResults: true
-      projects: $(solutionPath)
-      arguments: '--configuration $(configuration) --no-build --collect:"XPlat Code Coverage"'
-  # The PublishCodeCoverageResults task only supports publishing a single coverage result file,
-  # so the results are merged into a single cobertura file using "ReportGenerator"
-  # The dotnet test task redirects test results to $(Agent.TempDirectory) so coverage reports will be written there, too
-  - script: >-
-      dotnet tool run reportgenerator
-      -reports:$(Agent.TempDirectory)/**/coverage.cobertura.xml
-      -targetdir:$(Agent.TempDirectory)/TestResults/Coverage
-      -reporttypes:cobertura
-    displayName: Merge Code Coverage Results
-  - task: PublishCodeCoverageResults@1
-    displayName: Publish Code Coverage results
-    inputs:
-      codeCoverageTool: cobertura
-      summaryFileLocation: $(Agent.TempDirectory)/TestResults/Coverage/Cobertura.xml
-      failIfCoverageEmpty: true
-
-
-  # Create NuGet Package and  publish as build artifact
-  - task: CmdLine@2
-    displayName: Pack NuGet package
-    inputs:
-      script: >-
-        dotnet pack $(solutionPath)
-        --configuration $(configuration)
-        --output $(Build.ArtifactStagingDirectory)
-        --no-build
-        /warnaserror
-  # Use a inline Powershell script for publishing artifacts instead of the built-in PublishBuildArtifacts task
-  # because the built-in task does not support wildcards and the artifacts staging directory contains other
-  # artifacts as well (e.g. the variables JSON file published as the 'Variables' artifacts)
-  - powershell: |
-      $packageFiles = Get-ChildItem -Path "$(Build.ArtifactStagingDirectory)" -Filter "*.nupkg"
-      foreach($packageFile in $packageFiles) {
-        Write-Host "Publishing Artifact '$($packageFile.FullName)'"
-        Write-Host "##vso[artifact.upload artifactname=$(artifactsName_Binaries)]$($packageFile.FullName)"
-      }
-    displayName: 'Publish Artifacts: $(artifactsName_Binaries)'
-
-  # Verify documentation
-  - task: DotNetCoreCLI@2
-    inputs:
-      command: run
-      arguments: >-
-        --project ./utilities/docs/docs.csproj
-        --
-        validate ./docs README.md
-    displayName: Validate documentation
-
-  # Verify configuration file schema
-  - task: DotNetCoreCLI@2
-    inputs:
-      command: run
-      arguments: >-
-        --project ./utilities/schema/schema.csproj
-        --
-        validate ./schemas/configuration/schema.json
-    displayName: Validate Configuration File Schema
-
-  # Generate changelog and publish as build artifact
-  - task: DotNetCoreCLI@2
-    displayName: Generate Change Log
-    inputs:
-      command: run
-      arguments: >-
-        --project ./src/ChangeLog/Grynwald.ChangeLog.csproj
-        --framework net5.0
-        --
-        --currentVersion $(NBGV_NuGetPackageVersion)
-        --versionRange [$(NBGV_NuGetPackageVersion)]
-        --outputpath $(Build.StagingDirectory)/changelog.md
-        --template GitHubRelease
-        --verbose
+ 
+  # Restore, Build, Test
+  - powershell: ./build.ps1 --target CI --configuration $(configuration)
+    displayName: Main Build
     env:
       CHANGELOG__INTEGRATIONS__GITHUB__ACCESSTOKEN: $(GitHub.AccessToken)
 
-  - task: PublishBuildArtifacts@1
-    displayName: 'Publish Artifacts: $(artifactsName_ChangeLog)'
-    inputs:
-      pathToPublish: $(Build.StagingDirectory)/changelog.md
-      artifactName: $(artifactsName_ChangeLog)
+ 
 
 # Job to push package to MyGet.org after build
 - job: Publish_to_MyGet
