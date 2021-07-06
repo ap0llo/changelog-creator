@@ -1490,8 +1490,8 @@
       },
       "Zio": {
         "type": "Transitive",
-        "resolved": "0.11.0",
-        "contentHash": "eNHy6n/UCuQKtqCVw2XIw7L9g1/5vEFuMJ8aLM6tXLxh+vAFajwW1+oFAL65t31YNWro0uLDCez5mGsamC73QA=="
+        "resolved": "0.12.0",
+        "contentHash": "i/p3S14P3/37qX16JZJ1nA80p8pkpP2LkvkGr79Wm9tvIujtIBHhaBes/H8PFu48YfG87bIlc6pwFdwNVvd6+g=="
       },
       "gitlabapiclient": {
         "type": "Project",
@@ -1518,7 +1518,7 @@
           "NuGet.Versioning": "5.10.0",
           "Octokit": "0.50.0",
           "Scriban": "4.0.1",
-          "Zio": "0.11.0"
+          "Zio": "0.12.0"
         }
       }
     },
@@ -3479,8 +3479,8 @@
       },
       "Zio": {
         "type": "Transitive",
-        "resolved": "0.11.0",
-        "contentHash": "eNHy6n/UCuQKtqCVw2XIw7L9g1/5vEFuMJ8aLM6tXLxh+vAFajwW1+oFAL65t31YNWro0uLDCez5mGsamC73QA=="
+        "resolved": "0.12.0",
+        "contentHash": "i/p3S14P3/37qX16JZJ1nA80p8pkpP2LkvkGr79Wm9tvIujtIBHhaBes/H8PFu48YfG87bIlc6pwFdwNVvd6+g=="
       },
       "gitlabapiclient": {
         "type": "Project",
@@ -3507,7 +3507,7 @@
           "NuGet.Versioning": "5.10.0",
           "Octokit": "0.50.0",
           "Scriban": "4.0.1",
-          "Zio": "0.11.0"
+          "Zio": "0.12.0"
         }
       }
     },
@@ -5447,8 +5447,8 @@
       },
       "Zio": {
         "type": "Transitive",
-        "resolved": "0.11.0",
-        "contentHash": "eNHy6n/UCuQKtqCVw2XIw7L9g1/5vEFuMJ8aLM6tXLxh+vAFajwW1+oFAL65t31YNWro0uLDCez5mGsamC73QA=="
+        "resolved": "0.12.0",
+        "contentHash": "i/p3S14P3/37qX16JZJ1nA80p8pkpP2LkvkGr79Wm9tvIujtIBHhaBes/H8PFu48YfG87bIlc6pwFdwNVvd6+g=="
       },
       "gitlabapiclient": {
         "type": "Project",
@@ -5475,7 +5475,7 @@
           "NuGet.Versioning": "5.10.0",
           "Octokit": "0.50.0",
           "Scriban": "4.0.1",
-          "Zio": "0.11.0"
+          "Zio": "0.12.0"
         }
       }
     }

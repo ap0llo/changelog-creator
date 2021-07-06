@@ -170,9 +170,9 @@
       },
       "Zio": {
         "type": "Direct",
-        "requested": "[0.11.0, )",
-        "resolved": "0.11.0",
-        "contentHash": "eNHy6n/UCuQKtqCVw2XIw7L9g1/5vEFuMJ8aLM6tXLxh+vAFajwW1+oFAL65t31YNWro0uLDCez5mGsamC73QA=="
+        "requested": "[0.12.0, )",
+        "resolved": "0.12.0",
+        "contentHash": "i/p3S14P3/37qX16JZJ1nA80p8pkpP2LkvkGr79Wm9tvIujtIBHhaBes/H8PFu48YfG87bIlc6pwFdwNVvd6+g=="
       },
       "LibGit2Sharp.NativeBinaries": {
         "type": "Transitive",
@@ -518,9 +518,9 @@
       },
       "Zio": {
         "type": "Direct",
-        "requested": "[0.11.0, )",
-        "resolved": "0.11.0",
-        "contentHash": "eNHy6n/UCuQKtqCVw2XIw7L9g1/5vEFuMJ8aLM6tXLxh+vAFajwW1+oFAL65t31YNWro0uLDCez5mGsamC73QA=="
+        "requested": "[0.12.0, )",
+        "resolved": "0.12.0",
+        "contentHash": "i/p3S14P3/37qX16JZJ1nA80p8pkpP2LkvkGr79Wm9tvIujtIBHhaBes/H8PFu48YfG87bIlc6pwFdwNVvd6+g=="
       },
       "LibGit2Sharp.NativeBinaries": {
         "type": "Transitive",
@@ -794,9 +794,9 @@
       },
       "Zio": {
         "type": "Direct",
-        "requested": "[0.11.0, )",
-        "resolved": "0.11.0",
-        "contentHash": "eNHy6n/UCuQKtqCVw2XIw7L9g1/5vEFuMJ8aLM6tXLxh+vAFajwW1+oFAL65t31YNWro0uLDCez5mGsamC73QA=="
+        "requested": "[0.12.0, )",
+        "resolved": "0.12.0",
+        "contentHash": "i/p3S14P3/37qX16JZJ1nA80p8pkpP2LkvkGr79Wm9tvIujtIBHhaBes/H8PFu48YfG87bIlc6pwFdwNVvd6+g=="
       },
       "LibGit2Sharp.NativeBinaries": {
         "type": "Transitive",
